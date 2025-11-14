@@ -12,13 +12,12 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Alert,
   Paper,
+  IconButton,
 } from '@mui/material';
 import {
-  AttachMoney as CurrencyIcon,
   Close as CloseIcon,
-  Refresh as RenewIcon,
+  InfoOutlined as InfoIcon,
 } from '@mui/icons-material';
 import currencyService from '../services/currencyService';
 
@@ -74,6 +73,10 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
     onConfirmRenewal(selectedCurrency);
   };
 
+  const displayPrice = converting ? '...' : convertedPrice 
+    ? convertedPrice.formatted_converted 
+    : `$${basePrice.toFixed(2)} USD`;
+
   return (
     <Dialog 
       open={open} 
@@ -82,120 +85,179 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: '#1e3a8a',
-          color: '#ffffff',
+          backgroundColor: '#ffffff',
+          color: '#1a1a1a',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
         }
       }}
     >
       <DialogTitle sx={{ 
-        background: 'linear-gradient(45deg, #1e3a8a 30%, #0891b2 90%)',
-        color: 'white',
+        backgroundColor: '#ffffff',
+        color: '#1a1a1a',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        pt: 3,
+        pb: 2,
+        px: 3,
       }}>
-        <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
-          🔄 Renew Your eSIM Plan
+        <Typography variant="h5" component="div" sx={{ fontWeight: 700, fontSize: '1.5rem' }}>
+          Renew Your eSIM Plan
         </Typography>
-        <CloseIcon 
+        <IconButton 
           onClick={onClose} 
-          sx={{ cursor: 'pointer', '&:hover': { color: '#0891b2' } }}
-        />
+          size="small"
+          sx={{ color: '#6b7280', '&:hover': { color: '#1a1a1a', backgroundColor: '#f3f4f6' } }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ mt: 2 }}>
+      <DialogContent sx={{ px: 3, pb: 2 }}>
         {esimData && (
           <Box>
-            <Paper sx={{ p: 2, mb: 3, backgroundColor: 'rgba(255,255,255,0.1)' }}>
-              <Typography variant="h6" sx={{ color: '#0891b2', mb: 1 }}>
-                Current Plan Details
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Plan:</strong> {esimData.plan_name}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Data Capacity:</strong> {esimData.data_capacity}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Validity:</strong> {esimData.validity}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Provider:</strong> {esimData.api_provider}
+            {/* Current Plan Details */}
+            <Typography variant="h6" sx={{ color: '#1a1a1a', mb: 2, fontWeight: 600, fontSize: '1.1rem' }}>
+              Current Plan Details
+            </Typography>
+            
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2.5, 
+                mb: 3, 
+                backgroundColor: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.95rem' }}>
+                  Plan
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.95rem' }}>
+                  {esimData.data_capacity || '5 GB'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.95rem' }}>
+                  Data Capacity
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.95rem' }}>
+                  {esimData.data_capacity || '5 GB'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.95rem' }}>
+                  Validity
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.95rem' }}>
+                  {esimData.validity || '20 days'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.95rem' }}>
+                  Provider
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.95rem' }}>
+                  {esimData.api_provider || 'ExampleTel'}
+                </Typography>
+              </Box>
+            </Paper>
+
+            {/* Info Message */}
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2, 
+                mb: 3, 
+                backgroundColor: '#eff6ff',
+                border: '1px solid #dbeafe',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 1.5,
+              }}
+            >
+              <InfoIcon sx={{ color: '#3b82f6', fontSize: '1.25rem', mt: 0.2 }} />
+              <Typography variant="body2" sx={{ color: '#1e40af', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                Your eSIM plan will be renewed immediately after payment is completed.
               </Typography>
             </Paper>
 
-            <Alert severity="info" sx={{ mb: 3 }}>
-              You will renew the same plan for your eSIM. Select your preferred currency and proceed to payment.
-            </Alert>
-
+            {/* Payment Currency */}
+            <Typography variant="h6" sx={{ color: '#1a1a1a', mb: 1.5, fontWeight: 600, fontSize: '1rem' }}>
+              Payment Currency
+            </Typography>
+            
             <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel 
-                id="currency-select-label"
-                sx={{ color: 'rgba(255,255,255,0.7)' }}
-              >
-                Payment Currency
-              </InputLabel>
               <Select
-                labelId="currency-select-label"
                 value={selectedCurrency}
-                label="Payment Currency"
                 onChange={(e) => setSelectedCurrency(e.target.value)}
-                startAdornment={<CurrencyIcon sx={{ mr: 1, color: '#0891b2' }} />}
                 sx={{
-                  color: 'white',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '8px',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255,255,255,0.3)',
+                    borderColor: '#e5e7eb',
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255,255,255,0.5)',
+                    borderColor: '#d1d5db',
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#0891b2',
+                    borderColor: '#1a1a1a',
                   },
-                  '& .MuiSvgIcon-root': {
-                    color: 'rgba(255,255,255,0.7)',
+                  '& .MuiSelect-select': {
+                    color: '#1a1a1a',
+                    fontWeight: 500,
                   },
                 }}
               >
                 {availableCurrencies.map((currency) => (
                   <MenuItem key={currency.code} value={currency.code}>
-                    {currency.symbol} {currency.code} - {currency.name}
+                    {currency.code}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <Paper sx={{ p: 2, backgroundColor: 'rgba(8, 145, 178, 0.15)', border: '1px solid #0891b2' }}>
-              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-                Renewal Price:
+            {/* Renewal Price */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6" sx={{ color: '#1a1a1a', fontWeight: 600, fontSize: '1rem' }}>
+                Renewal Price
               </Typography>
               {converting ? (
-                <CircularProgress size={20} sx={{ color: '#0891b2' }} />
-              ) : convertedPrice ? (
-                <Box>
-                  <Typography variant="h5" sx={{ color: '#0891b2', fontWeight: 700 }}>
-                    {convertedPrice.formatted_converted}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Original: {convertedPrice.formatted_original}
-                  </Typography>
-                </Box>
+                <CircularProgress size={24} sx={{ color: '#1a1a1a' }} />
               ) : (
-                <Typography variant="h5" sx={{ color: '#0891b2', fontWeight: 700 }}>
-                  ${basePrice.toFixed(2)} USD
+                <Typography variant="h4" sx={{ color: '#1a1a1a', fontWeight: 700, fontSize: '2rem' }}>
+                  {displayPrice}
                 </Typography>
               )}
-            </Paper>
+            </Box>
           </Box>
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2 }}>
+      <DialogActions sx={{ p: 3, pt: 1, gap: 2 }}>
         <Button 
           onClick={onClose}
+          variant="outlined"
+          fullWidth
           sx={{ 
-            color: 'rgba(255,255,255,0.7)',
-            '&:hover': { color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' }
+            color: '#1a1a1a',
+            borderColor: '#e5e7eb',
+            textTransform: 'none',
+            fontWeight: 600,
+            py: 1.5,
+            borderRadius: '8px',
+            fontSize: '1rem',
+            '&:hover': { 
+              borderColor: '#d1d5db',
+              backgroundColor: '#f9fafb'
+            }
           }}
         >
           Cancel
@@ -203,12 +265,17 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
         <Button
           onClick={handleConfirm}
           variant="contained"
-          startIcon={<RenewIcon />}
+          fullWidth
           sx={{
-            px: 4,
-            background: 'linear-gradient(45deg, #0891b2 30%, #06b6d4 90%)',
+            backgroundColor: '#1a1a1a',
+            color: 'white',
+            textTransform: 'none',
+            fontWeight: 600,
+            py: 1.5,
+            borderRadius: '8px',
+            fontSize: '1rem',
             '&:hover': {
-              background: 'linear-gradient(45deg, #0891b2 50%, #06b6d4 100%)',
+              backgroundColor: '#2d2d2d',
             }
           }}
         >
@@ -220,4 +287,3 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
 };
 
 export default SimpleRenewalDialog;
-

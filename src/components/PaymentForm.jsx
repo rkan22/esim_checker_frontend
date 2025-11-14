@@ -31,12 +31,12 @@ const stripePromise = loadStripe('pk_test_51Ru78dI1g8LlVdIJzVNdYoRxS2600fVj97j86
 const CARD_ELEMENT_OPTIONS = {
   style: {
     base: {
-      color: '#ffffff',
+      color: '#1a1a1a',
       fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
       fontSmoothing: 'antialiased',
       fontSize: '16px',
       '::placeholder': {
-        color: 'rgba(255, 255, 255, 0.5)',
+        color: '#9ca3af',
       },
     },
     invalid: {
@@ -96,45 +96,46 @@ const CheckoutForm = ({ clientSecret, amount, currency, packageName, onSuccess, 
   return (
     <form onSubmit={handleSubmit}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255,255,255,0.7)' }}>
-          You are purchasing: <strong>{packageName}</strong>
+        <Typography variant="body2" sx={{ mb: 2, color: '#6b7280', fontSize: '0.95rem' }}>
+          You are purchasing: <strong style={{ color: '#1a1a1a' }}>{packageName}</strong>
         </Typography>
-        
-        <Paper 
+
+        <Paper
           elevation={0}
-          sx={{ 
-            p: 2, 
-            backgroundColor: 'rgba(8, 145, 178, 0.15)',
-            border: '1px solid #0891b2',
+          sx={{
+            p: 2.5,
+            backgroundColor: '#f9fafb',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
             mb: 3,
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 600, color: '#0891b2' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a1a1a', fontSize: '1.5rem' }}>
             Total: ${amount} {currency}
           </Typography>
         </Paper>
 
         <Box
           sx={{
-            p: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: 1,
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            p: 2.5,
+            backgroundColor: '#ffffff',
+            borderRadius: '8px',
+            border: '1px solid #e5e7eb',
           }}
         >
-          <Box display="flex" alignItems="center" mb={1}>
-            <CreditCardIcon sx={{ mr: 1, color: '#0891b2' }} />
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          <Box display="flex" alignItems="center" mb={1.5}>
+            <CreditCardIcon sx={{ mr: 1, color: '#6b7280' }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
               Card Details
             </Typography>
           </Box>
-          <CardElement 
+          <CardElement
             options={CARD_ELEMENT_OPTIONS}
             onChange={(e) => setCardComplete(e.complete)}
           />
         </Box>
 
-        <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'rgba(255,255,255,0.5)' }}>
+        <Typography variant="caption" sx={{ display: 'block', mt: 1.5, color: '#9ca3af', fontSize: '0.8rem' }}>
           Test Card: 4242 4242 4242 4242 | Any future date | Any 3 digits
         </Typography>
       </Box>
@@ -149,9 +150,19 @@ const CheckoutForm = ({ clientSecret, amount, currency, packageName, onSuccess, 
         <Button
           onClick={onClose}
           disabled={processing}
-          sx={{ 
-            color: 'rgba(255,255,255,0.7)',
-            '&:hover': { color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' }
+          variant="outlined"
+          sx={{
+            color: '#1a1a1a',
+            borderColor: '#e5e7eb',
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 4,
+            py: 1.2,
+            borderRadius: '8px',
+            '&:hover': {
+              borderColor: '#d1d5db',
+              backgroundColor: '#f9fafb'
+            }
           }}
         >
           Cancel
@@ -161,16 +172,19 @@ const CheckoutForm = ({ clientSecret, amount, currency, packageName, onSuccess, 
           disabled={!stripe || processing || !cardComplete}
           variant="contained"
           sx={{
-            background: 'linear-gradient(45deg, #059669 30%, #10b981 90%)',
+            backgroundColor: '#1a1a1a',
             color: 'white',
             fontWeight: 600,
             px: 4,
+            py: 1.2,
+            textTransform: 'none',
+            borderRadius: '8px',
             '&:hover': {
-              background: 'linear-gradient(45deg, #10b981 30%, #059669 90%)',
+              backgroundColor: '#2d2d2d',
             },
             '&:disabled': {
-              background: 'rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.3)',
+              backgroundColor: '#e5e7eb',
+              color: '#9ca3af',
             }
           }}
         >
@@ -188,46 +202,49 @@ const CheckoutForm = ({ clientSecret, amount, currency, packageName, onSuccess, 
   );
 };
 
-const PaymentDialog = ({ 
-  open, 
-  onClose, 
-  clientSecret, 
-  amount, 
-  currency, 
+const PaymentDialog = ({
+  open,
+  onClose,
+  clientSecret,
+  amount,
+  currency,
   packageName,
   onSuccess,
-  onError 
+  onError
 }) => {
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: '#1e3a8a',
-          color: '#ffffff',
+          backgroundColor: '#ffffff',
+          color: '#1a1a1a',
+          borderRadius: '12px',
         }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(45deg, #1e3a8a 30%, #0891b2 90%)',
-        color: 'white',
+      <DialogTitle sx={{
+        backgroundColor: '#ffffff',
+        color: '#1a1a1a',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        pb: 2,
+        pt: 3,
       }}>
-        <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
+        <Typography variant="h5" component="div" sx={{ fontWeight: 700, fontSize: '1.75rem' }}>
           💳 Payment Details
         </Typography>
-        <CloseIcon 
-          onClick={onClose} 
-          sx={{ cursor: 'pointer', '&:hover': { color: '#0891b2' } }}
+        <CloseIcon
+          onClick={onClose}
+          sx={{ cursor: 'pointer', color: '#6b7280', '&:hover': { color: '#1a1a1a' } }}
         />
       </DialogTitle>
 
-      <DialogContent sx={{ mt: 2 }}>
+      <DialogContent sx={{ mt: 1, pb: 3 }}>
         {clientSecret ? (
           <Elements stripe={stripePromise}>
             <CheckoutForm
@@ -242,7 +259,7 @@ const PaymentDialog = ({
           </Elements>
         ) : (
           <Box display="flex" justifyContent="center" py={4}>
-            <CircularProgress sx={{ color: '#0891b2' }} />
+            <CircularProgress sx={{ color: '#1a1a1a' }} />
           </Box>
         )}
       </DialogContent>
@@ -252,40 +269,42 @@ const PaymentDialog = ({
 
 export const SuccessDialog = ({ open, onClose, onSendEmail }) => {
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: '#1e3a8a',
-          color: '#ffffff',
+          backgroundColor: '#ffffff',
+          color: '#1a1a1a',
+          borderRadius: '12px',
         }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(45deg, #059669 30%, #10b981 90%)',
-        color: 'white',
+      <DialogTitle sx={{
+        backgroundColor: '#ffffff',
+        color: '#1a1a1a',
         textAlign: 'center',
+        pt: 4,
       }}>
-        <CheckCircleIcon sx={{ fontSize: 60, mb: 1 }} />
-        <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
+        <CheckCircleIcon sx={{ fontSize: 60, mb: 1, color: '#10b981' }} />
+        <Typography variant="h5" component="div" sx={{ fontWeight: 700 }}>
           Payment Successful!
         </Typography>
       </DialogTitle>
 
       <DialogContent sx={{ mt: 2, textAlign: 'center' }}>
-        <Typography variant="body1" sx={{ mb: 2 }}>
+        <Typography variant="body1" sx={{ mb: 2, color: '#1a1a1a', fontWeight: 500 }}>
           Your eSIM has been successfully renewed!
         </Typography>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+        <Typography variant="body2" sx={{ color: '#6b7280' }}>
           The renewal is being processed and should be active within a few minutes.
         </Typography>
 
-        <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
+        <Divider sx={{ my: 3, borderColor: '#e5e7eb' }} />
 
-        <Typography variant="body2" sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ mb: 2, color: '#1a1a1a' }}>
           Would you like to receive the eSIM details via email?
         </Typography>
       </DialogContent>
@@ -293,9 +312,19 @@ export const SuccessDialog = ({ open, onClose, onSendEmail }) => {
       <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2 }}>
         <Button
           onClick={onClose}
-          sx={{ 
-            color: 'rgba(255,255,255,0.7)',
-            '&:hover': { color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' }
+          variant="outlined"
+          sx={{
+            color: '#1a1a1a',
+            borderColor: '#e5e7eb',
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 4,
+            py: 1,
+            borderRadius: '8px',
+            '&:hover': {
+              borderColor: '#d1d5db',
+              backgroundColor: '#f9fafb'
+            }
           }}
         >
           No Thanks
@@ -304,12 +333,15 @@ export const SuccessDialog = ({ open, onClose, onSendEmail }) => {
           onClick={onSendEmail}
           variant="contained"
           sx={{
-            background: 'linear-gradient(45deg, #0891b2 30%, #06b6d4 90%)',
+            backgroundColor: '#1a1a1a',
             color: 'white',
             fontWeight: 600,
             px: 4,
+            py: 1,
+            textTransform: 'none',
+            borderRadius: '8px',
             '&:hover': {
-              background: 'linear-gradient(45deg, #06b6d4 30%, #0891b2 90%)',
+              backgroundColor: '#2d2d2d',
             }
           }}
         >
@@ -321,4 +353,3 @@ export const SuccessDialog = ({ open, onClose, onSendEmail }) => {
 };
 
 export default PaymentDialog;
-

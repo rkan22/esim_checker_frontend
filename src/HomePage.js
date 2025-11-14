@@ -2,28 +2,20 @@ import React, { useState } from 'react';
 import {
   Container,
   Box,
-  Paper,
   TextField,
   Button,
   Typography,
-  Grid,
   CircularProgress,
-  Alert,
   InputAdornment,
-  Divider,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardIcon from '@mui/icons-material/SimCard';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { checkESIMStatus } from './services/esimService';
 import { createRenewalOrder, confirmPayment } from './services/renewalService';
 import SimpleRenewalDialog from './components/SimpleRenewalDialog';
 import PaymentDialog, { SuccessDialog } from './components/PaymentForm';
 import EmailDialog from './components/EmailDialog';
+import ESIMResults from './components/ESIMResults';
 import './App.css';
 
 function HomePage() {
@@ -32,7 +24,7 @@ function HomePage() {
   const [error, setError] = useState(null);
   const [esimData, setEsimData] = useState(null);
   const [copiedField, setCopiedField] = useState(null);
-  
+
   // Renewal state
   const [renewalDialogOpen, setRenewalDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -46,7 +38,7 @@ function HomePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!iccid || iccid.trim().length < 10) {
       setError('Please enter a valid ICCID (minimum 10 digits)');
       return;
@@ -58,7 +50,7 @@ function HomePage() {
 
     try {
       const result = await checkESIMStatus(iccid.trim());
-      
+
       if (result.success) {
         setEsimData(result.data);
       } else {
@@ -83,24 +75,6 @@ function HomePage() {
     return match ? parseFloat(match[0]) : 0;
   };
 
-  const getChartData = () => {
-    const consumed = parseDataValue(esimData?.data_consumed);
-    const remaining = parseDataValue(esimData?.data_remaining);
-    
-    return [
-      { name: 'Consumed', value: consumed, color: '#4FC3F7' },
-      { name: 'Remaining', value: remaining, color: '#66BB6A' }
-    ];
-  };
-
-  const getTotalCapacity = () => {
-    return parseDataValue(esimData?.data_capacity);
-  };
-
-  const getRemainingData = () => {
-    return parseDataValue(esimData?.data_remaining);
-  };
-
   // Renewal Handlers
   const handleRenewClick = () => {
     setRenewalDialogOpen(true);
@@ -115,15 +89,14 @@ function HomePage() {
     try {
       // Extract country code from plan name or APN
       const extractCountryCode = (planName, apn) => {
-        // Country mappings
         const countryMap = {
           'turkey': 'TR', 'india': 'IN', 'usa': 'US', 'uk': 'GB',
           'germany': 'DE', 'france': 'FR', 'spain': 'ES', 'italy': 'IT'
         };
-        
+
         const lowerPlan = planName?.toLowerCase() || '';
         const lowerApn = apn?.toLowerCase() || '';
-        
+
         for (const [country, code] of Object.entries(countryMap)) {
           if (lowerPlan.includes(country) || lowerApn.includes(country)) {
             return code;
@@ -131,14 +104,13 @@ function HomePage() {
         }
         return null;
       };
-      
-      // Use the current eSIM's details for renewal
+
       const result = await createRenewalOrder({
         iccid: esimData.iccid,
         provider: esimData.api_provider,
         order_sim_id: esimData.order_sim_id,
         plan_name: esimData.plan_name,
-        amount: 10.00,  // Default amount, will be updated based on plan
+        amount: 10.00,
         currency: selectedCurrency,
         package_name: esimData.plan_name,
         renewal_days: 7,
@@ -146,10 +118,7 @@ function HomePage() {
       });
 
       if (result.success) {
-        // Store order information
         setRenewalOrderId(result.data.order.order_id);
-        
-        // Redirect to Stripe Checkout
         const checkoutUrl = result.data.payment.checkout_url;
         if (checkoutUrl) {
           window.location.href = checkoutUrl;
@@ -175,7 +144,6 @@ function HomePage() {
 
       if (result.success) {
         setSuccessDialogOpen(true);
-        // Refresh eSIM data
         const refreshResult = await checkESIMStatus(esimData.iccid);
         if (refreshResult.success) {
           setEsimData(refreshResult.data);
@@ -202,7 +170,6 @@ function HomePage() {
 
   const handleEmailDialogClose = () => {
     setEmailDialogOpen(false);
-    // Reset renewal state
     setSelectedPackage(null);
     setPaymentInfo(null);
     setRenewalOrderId(null);
@@ -210,13 +177,11 @@ function HomePage() {
 
   const handleSuccessDialogClose = () => {
     setSuccessDialogOpen(false);
-    // Reset renewal state
     setSelectedPackage(null);
     setPaymentInfo(null);
     setRenewalOrderId(null);
   };
 
-  // Check if eSIM is expired or inactive
   const isExpiredOrInactive = () => {
     if (!esimData) return false;
     const status = esimData.status?.toLowerCase();
@@ -224,123 +189,143 @@ function HomePage() {
   };
 
   return (
-    <Box className="app-background">
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        {/* Header */}
-        <Box textAlign="center" mb={6}>
-          <Box display="flex" alignItems="center" justifyContent="center" gap={2} mb={2}>
-            <SimCardIcon sx={{ fontSize: 48, color: '#1e3a8a' }} />
+    <>
+      {!esimData && (
+        <Box
+          sx={{
+            minHeight: '100vh',
+            backgroundImage: 'url(/background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {/* Logo */}
+          <Box sx={{ p: { xs: 3, md: 5 } }}>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <SimCardIcon sx={{ fontSize: 48, color: '#3b4d7a' }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '1.75rem',
+                    fontWeight: 700,
+                    color: '#2d3748',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  esimstatus
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: '0.875rem',
+                    color: '#64748b',
+                    lineHeight: 1,
+                    mt: 0.3,
+                  }}
+                >
+                  .com
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Container maxWidth="lg" sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', pb: '10%' }}>
+        {/* Main Content */}
+        {!esimData && !loading && (
+          <Box textAlign="center" sx={{ maxWidth: 900, mx: 'auto', px: 2 }}>
             <Typography
-              variant="h3"
               sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(90deg, #1e3a8a 0%, #4f46e5 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontWeight: 800,
+                color: '#1e293b',
+                mb: 3,
+                fontSize: { xs: '3.6rem', md: '5.4rem' },
+                lineHeight: 1.1,
               }}
             >
-              esimstatus
+              Check eSIM Details
             </Typography>
-          </Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: '#1e3a8a',
-              mb: 2,
-            }}
-          >
-            Check eSIM Details
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#475569',
-              fontWeight: 400,
-              maxWidth: 700,
-              mx: 'auto',
-            }}
-          >
-            Enter your ICCID to instantly view activation status,
-            <br />
-            data balance, and other details of your eSIM.
-          </Typography>
-        </Box>
+            <Typography
+              sx={{
+                color: '#475569',
+                fontWeight: 500,
+                mb: 6,
+                fontSize: { xs: '1.35rem', md: '1.8rem' },
+                lineHeight: 1.5,
+              }}
+            >
+              Enter your ICCID to instantly view activation status,
+              <br />
+              data balance, and other details of your eSIM.
+            </Typography>
 
-        {/* Search Form */}
-        {!esimData && !loading && (
-          <Box sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+            {/* Search Form */}
             <form onSubmit={handleSubmit}>
-              <Box display="flex" gap={2} alignItems="flex-start">
-                <Box flex={1}>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      color: '#1e3a8a',
-                      fontWeight: 600,
-                      mb: 1,
-                    }}
-                  >
-                    Enter ICCID:
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    placeholder="893407101001204344"
-                    value={iccid}
-                    onChange={(e) => setIccid(e.target.value)}
-                    variant="outlined"
-                    disabled={loading}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon sx={{ color: '#64748b' }} />
-                        </InputAdornment>
-                      ),
-                      sx: {
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        '& fieldset': {
-                          borderColor: '#e2e8f0',
-                          borderWidth: 2,
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#cbd5e1 !important',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#4f46e5 !important',
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ opacity: 0, mb: 1 }}
-                  >
-                    .
-                  </Typography>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={loading}
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      backgroundColor: '#1e3a8a',
-                      borderRadius: '12px',
-                      textTransform: 'none',
+              <Box display="flex" gap={2} alignItems="center" justifyContent="center" flexWrap="wrap">
+                <Typography
+                  sx={{
+                    color: '#1e293b',
+                    fontWeight: 800,
+                    fontSize: '1.35rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  Enter ICCID:
+                </Typography>
+                <TextField
+                  placeholder="8901XXXXXXXXXXXXX"
+                  value={iccid}
+                  onChange={(e) => setIccid(e.target.value)}
+                  variant="outlined"
+                  disabled={loading}
+                  sx={{ width: { xs: '100%', sm: '320px' } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ color: '#64748b', fontSize: 24 }} />
+                      </InputAdornment>
+                    ),
+                    sx: {
+                      backgroundColor: 'white',
+                      borderRadius: '50px',
+                      height: '56px',
                       fontSize: '1rem',
-                      fontWeight: 600,
-                      '&:hover': {
-                        backgroundColor: '#1e40af',
+                      '& fieldset': {
+                        borderColor: '#cbd5e1',
+                        borderWidth: 2,
                       },
-                    }}
-                  >
-                    Search
-                  </Button>
-                </Box>
+                      '&:hover fieldset': {
+                        borderColor: '#94a3b8 !important',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#1e293b !important',
+                      },
+                    },
+                  }}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  disabled={loading}
+                  sx={{
+                    px: 5,
+                    py: 1.75,
+                    backgroundColor: '#1e293b',
+                    borderRadius: '50px',
+                    textTransform: 'none',
+                    fontSize: '1.125rem',
+                    fontWeight: 700,
+                    height: '56px',
+                    '&:hover': {
+                      backgroundColor: '#334155',
+                    },
+                  }}
+                >
+                  Search
+                </Button>
               </Box>
             </form>
 
@@ -349,7 +334,7 @@ function HomePage() {
                 variant="body2"
                 sx={{
                   color: '#dc2626',
-                  mt: 2,
+                  mt: 3,
                   textAlign: 'center',
                 }}
               >
@@ -371,653 +356,124 @@ function HomePage() {
             </Typography>
           </Box>
         )}
+          </Container>
 
-        {/* Results */}
-        {esimData && !loading && (
-          <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-            <Paper
-              elevation={0}
+          {/* Footer */}
+          <Box sx={{ pb: 3, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
               sx={{
-                backgroundColor: '#1e3a8a',
-                borderRadius: '24px',
-                p: 4,
-                color: 'white',
-                position: 'relative',
-                overflow: 'hidden',
+                color: '#64748b',
               }}
             >
-              <Grid container spacing={4}>
-                {/* Left Side - Details */}
-                <Grid item xs={12} md={7}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 700,
-                      mb: 3,
-                    }}
-                  >
-                    eSIM Details
-                  </Typography>
-
-                  {/* API Provider Badge */}
-                  <Box mb={2}>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        backgroundColor: 'rgba(79, 195, 247, 0.2)',
-                        color: '#4FC3F7',
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: '8px',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      DATA SOURCE: {esimData.api_provider}
-                    </Box>
-                  </Box>
-
-                  {/* Order/SIM ID */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      Order/SIM ID:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      {esimData.order_sim_id}
-                      <Tooltip title={copiedField === 'order_id' ? 'Copied!' : 'Copy'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(esimData.order_sim_id, 'order_id')}
-                          sx={{ color: '#1e3a8a' }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-
-                  {/* ICCID */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      ICCID:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Box sx={{ wordBreak: 'break-all', pr: 1 }}>{esimData.iccid}</Box>
-                      <Tooltip title={copiedField === 'iccid' ? 'Copied!' : 'Copy'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(esimData.iccid, 'iccid')}
-                          sx={{ color: '#1e3a8a' }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-
-                  {/* Plan Name */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      Plan Name:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {esimData.plan_name}
-                    </Box>
-                  </Box>
-
-                  {/* Status */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      Status:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: esimData.status?.toLowerCase() === 'active' ? '#10b981' : '#f59e0b',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {esimData.status}
-                    </Box>
-                  </Box>
-
-                  {/* Purchase Date and Validity */}
-                  <Grid container spacing={2} mb={2.5}>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: 'rgba(255,255,255,0.7)',
-                          mb: 0.5,
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        Purchase Date:
-                      </Typography>
-                      <Box
-                        sx={{
-                          backgroundColor: 'white',
-                          color: '#1e3a8a',
-                          p: 1.5,
-                          borderRadius: '8px',
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        {esimData.purchase_date}
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: 'rgba(255,255,255,0.7)',
-                          mb: 0.5,
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        Validity:
-                      </Typography>
-                      <Box
-                        sx={{
-                          backgroundColor: 'white',
-                          color: '#1e3a8a',
-                          p: 1.5,
-                          borderRadius: '8px',
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        {esimData.validity}
-                      </Box>
-                    </Grid>
-                  </Grid>
-
-                  {/* Data Capacity */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      Data Capacity:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {esimData.data_capacity}
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ my: 2, backgroundColor: 'rgba(255,255,255,0.2)' }} />
-
-                  {/* Activation Code */}
-                  <Box mb={2.5}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      Activation Code:
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 400,
-                        fontFamily: 'monospace',
-                        fontSize: '0.75rem',
-                        wordBreak: 'break-all',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        gap: 1,
-                      }}
-                    >
-                      <Box flex={1}>{esimData.activation_code}</Box>
-                      <Tooltip title={copiedField === 'activation' ? 'Copied!' : 'Copy'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(esimData.activation_code, 'activation')}
-                          sx={{ color: '#1e3a8a', mt: -0.5 }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-
-                  {/* APN */}
-                  <Box mb={3}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.7)',
-                        mb: 0.5,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      APN (Access Point Name):
-                    </Typography>
-                    <Box
-                      sx={{
-                        backgroundColor: 'white',
-                        color: '#1e3a8a',
-                        p: 1.5,
-                        borderRadius: '8px',
-                        fontWeight: 500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      {esimData.apn}
-                      <Tooltip title={copiedField === 'apn' ? 'Copied!' : 'Copy'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopy(esimData.apn, 'apn')}
-                          sx={{ color: '#1e3a8a' }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-
-                  {/* Check Another Button */}
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => {
-                      setEsimData(null);
-                      setIccid('');
-                      setError(null);
-                    }}
-                    sx={{
-                      backgroundColor: '#0891b2',
-                      color: 'white',
-                      py: 1.5,
-                      borderRadius: '8px',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      '&:hover': {
-                        backgroundColor: '#06b6d4',
-                      },
-                    }}
-                  >
-                    Check another eSIM
-                  </Button>
-                </Grid>
-
-                {/* Right Side - Chart */}
-                <Grid item xs={12} md={5}>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        textAlign: 'right',
-                        mb: 2,
-                        fontWeight: 600,
-                      }}
-                    >
-                      Status:{' '}
-                      <span
-                        style={{
-                          color: esimData.status?.toLowerCase() === 'active' ? '#66BB6A' : '#FFA726',
-                        }}
-                      >
-                        {esimData.status}
-                      </span>
-                    </Typography>
-
-                    {/* Data Usage Section */}
-                    <Box
-                      sx={{
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '16px',
-                        p: 3,
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                        Data Usage
-                      </Typography>
-
-                      {/* Donut Chart */}
-                      {esimData.data_consumed !== 'N/A' && esimData.data_remaining !== 'N/A' ? (
-                        <>
-                          <Box position="relative" display="inline-block">
-                            <ResponsiveContainer width={240} height={240}>
-                              <PieChart>
-                                <Pie
-                                  data={getChartData()}
-                                  cx="50%"
-                                  cy="50%"
-                                  innerRadius={70}
-                                  outerRadius={100}
-                                  paddingAngle={2}
-                                  dataKey="value"
-                                >
-                                  {getChartData().map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                  ))}
-                                </Pie>
-                              </PieChart>
-                            </ResponsiveContainer>
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                textAlign: 'center',
-                              }}
-                            >
-                              <Typography
-                                variant="h4"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: 'white',
-                                  lineHeight: 1,
-                                }}
-                              >
-                                {getRemainingData().toFixed(2)} GB
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  color: 'rgba(255,255,255,0.8)',
-                                  mt: 0.5,
-                                }}
-                              >
-                                left
-                              </Typography>
-                            </Box>
-                          </Box>
-
-                          {/* Legend */}
-                          <Box mt={3}>
-                            <Box display="flex" justifyContent="center" gap={3} mb={2}>
-                              <Box display="flex" alignItems="center" gap={1}>
-                                <Box
-                                  sx={{
-                                    width: 16,
-                                    height: 16,
-                                    backgroundColor: '#4FC3F7',
-                                    borderRadius: '4px',
-                                  }}
-                                />
-                                <Typography variant="body2" fontSize="0.875rem">
-                                  Consumed
-                                </Typography>
-                              </Box>
-                              <Box display="flex" alignItems="center" gap={1}>
-                                <Box
-                                  sx={{
-                                    width: 16,
-                                    height: 16,
-                                    backgroundColor: '#66BB6A',
-                                    borderRadius: '4px',
-                                  }}
-                                />
-                                <Typography variant="body2" fontSize="0.875rem">
-                                  Remaining
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </Box>
-                        </>
-                      ) : (
-                        <Box
-                          sx={{
-                            height: 240,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.7)', mb: 1 }}>
-                            No usage data available
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                            eSIM may be inactive or not yet activated
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {/* Data Stats */}
-                      <Divider sx={{ my: 2, backgroundColor: 'rgba(255,255,255,0.2)' }} />
-                      
-                      <Box textAlign="left">
-                        <Box display="flex" justifyContent="space-between" mb={1}>
-                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                            Data Consumed:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {esimData.data_consumed}
-                          </Typography>
-                        </Box>
-                        <Box display="flex" justifyContent="space-between" mb={1}>
-                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                            Data Remaining:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {esimData.data_remaining}
-                          </Typography>
-                        </Box>
-                        <Box display="flex" justifyContent="space-between">
-                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                            Total Capacity:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {esimData.data_capacity}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-
-                    {/* Last Updated */}
-                    {esimData.last_updated && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'rgba(255,255,255,0.6)',
-                          display: 'block',
-                          mt: 2,
-                        }}
-                      >
-                        Last Updated: {new Date(esimData.last_updated).toLocaleString()}
-                      </Typography>
-                    )}
-                  </Box>
-                </Grid>
-              </Grid>
-
-              {/* Renewal Button */}
-              {isExpiredOrInactive() && (
-                <Box sx={{ mt: 3, textAlign: 'center' }}>
-                  <Button
-                    onClick={handleRenewClick}
-                    variant="contained"
-                    size="large"
-                    startIcon={<AutorenewIcon />}
-                    disabled={renewalLoading}
-                    sx={{
-                      background: 'linear-gradient(45deg, #0891b2 30%, #06b6d4 90%)',
-                      color: 'white',
-                      fontWeight: 600,
-                      px: 6,
-                      py: 1.5,
-                      fontSize: '1.1rem',
-                      boxShadow: '0 4px 20px rgba(8, 145, 178, 0.4)',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #06b6d4 30%, #0891b2 90%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 6px 24px rgba(8, 145, 178, 0.5)',
-                      },
-                      '&:disabled': {
-                        background: 'rgba(255,255,255,0.1)',
-                        color: 'rgba(255,255,255,0.3)',
-                      }
-                    }}
-                  >
-                    {renewalLoading ? 'Processing...' : 'Renew Plan'}
-                  </Button>
-                  
-                  {renewalError && (
-                    <Alert severity="error" sx={{ mt: 2, maxWidth: 500, mx: 'auto' }}>
-                      {renewalError}
-                    </Alert>
-                  )}
-                </Box>
-              )}
-            </Paper>
-
-            {/* Check Another eSIM Button */}
-            <Box textAlign="center" mt={4}>
-              <Button
-                onClick={() => {
-                  setEsimData(null);
-                  setError(null);
-                  setIccid('');
-                }}
-                variant="contained"
-                sx={{
-                  background: 'linear-gradient(45deg, #0891b2 30%, #06b6d4 90%)',
-                  color: 'white',
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1,
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #06b6d4 30%, #0891b2 90%)',
-                  }
-                }}
-              >
-                Check Another eSIM
-              </Button>
-            </Box>
+              Copyright © 2025 esimstatus.com
+            </Typography>
           </Box>
-        )}
+        </Box>
+      )}
 
-        {/* Renewal Dialogs */}
-        <SimpleRenewalDialog
-          open={renewalDialogOpen}
-          onClose={() => setRenewalDialogOpen(false)}
-          esimData={esimData}
-          onConfirmRenewal={handlePackageSelect}
-        />
-
-        <PaymentDialog
-          open={paymentDialogOpen}
-          onClose={() => setPaymentDialogOpen(false)}
-          clientSecret={paymentInfo?.client_secret}
-          amount={paymentInfo?.amount}
-          currency={paymentInfo?.currency}
-          packageName={selectedPackage?.package_name}
-          onSuccess={handlePaymentSuccess}
-          onError={handlePaymentError}
-        />
-
-        <SuccessDialog
-          open={successDialogOpen}
-          onClose={handleSuccessDialogClose}
-          onSendEmail={handleSendEmailClick}
-        />
-
-        <EmailDialog
-          open={emailDialogOpen}
-          onClose={handleEmailDialogClose}
-          orderId={renewalOrderId}
-        />
-
-        {/* Footer */}
-        <Typography
-          variant="body2"
-          textAlign="center"
+      {/* Results */}
+      {esimData && !loading && (
+        <Box
           sx={{
-            mt: 6,
-            color: '#64748b',
+            minHeight: '100vh',
+            backgroundImage: 'url(/backdround_two.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          Copyright © 2025 esimstatus.com
-        </Typography>
-      </Container>
-    </Box>
+          {/* Logo */}
+          <Box sx={{ p: 2 }}>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <SimCardIcon sx={{ fontSize: 48, color: '#3b4d7a' }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: '#2d3748',
+                    lineHeight: 1,
+                  }}
+                >
+                  esimstatus
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: '0.75rem',
+                    color: '#64748b',
+                    lineHeight: 1,
+                  }}
+                >
+                  .com
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: -2 }}>
+            <ESIMResults
+              esimData={esimData}
+              copiedField={copiedField}
+              handleCopy={handleCopy}
+              parseDataValue={parseDataValue}
+              onCheckAnother={() => {
+                setEsimData(null);
+                setIccid('');
+                setError(null);
+              }}
+              onRenewPackage={handleRenewClick}
+            />
+          </Box>
+
+          {/* Footer */}
+          <Box sx={{ pb: 2, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#64748b',
+                fontSize: '0.75rem',
+              }}
+            >
+              Copyright © 2025 esimstatus.com
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
+      {/* Renewal Dialogs */}
+      <SimpleRenewalDialog
+        open={renewalDialogOpen}
+        onClose={() => setRenewalDialogOpen(false)}
+        esimData={esimData}
+        onConfirmRenewal={handlePackageSelect}
+      />
+
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onClose={() => setPaymentDialogOpen(false)}
+        clientSecret={paymentInfo?.client_secret}
+        amount={paymentInfo?.amount}
+        currency={paymentInfo?.currency}
+        packageName={selectedPackage?.package_name}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
+      />
+
+      <SuccessDialog
+        open={successDialogOpen}
+        onClose={handleSuccessDialogClose}
+        onSendEmail={handleSendEmailClick}
+      />
+
+      <EmailDialog
+        open={emailDialogOpen}
+        onClose={handleEmailDialogClose}
+        orderId={renewalOrderId}
+      />
+    </>
   );
 }
 
