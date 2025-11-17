@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/esim';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://esim-status-checker-backend.onrender.com/api/esim';
 
 /**
  * Currency Service for handling currency conversions and rates
