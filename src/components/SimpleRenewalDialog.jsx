@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import currencyService from '../services/currencyService';
 
-const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
+const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal, loading }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [availableCurrencies, setAvailableCurrencies] = useState([]);
   const [convertedPrice, setConvertedPrice] = useState(null);
@@ -80,9 +80,10 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
   return (
     <Dialog 
       open={open} 
-      onClose={onClose}
+      onClose={loading ? () => {} : onClose}
       maxWidth="sm"
       fullWidth
+      disableEscapeKeyDown={loading}
       PaperProps={{
         sx: {
           backgroundColor: '#ffffff',
@@ -108,7 +109,12 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
         <IconButton 
           onClick={onClose} 
           size="small"
-          sx={{ color: '#6b7280', '&:hover': { color: '#1a1a1a', backgroundColor: '#f3f4f6' } }}
+          disabled={loading}
+          sx={{ 
+            color: '#6b7280', 
+            '&:hover': { color: '#1a1a1a', backgroundColor: '#f3f4f6' },
+            '&.Mui-disabled': { color: '#d1d5db' }
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -198,6 +204,7 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
               <Select
                 value={selectedCurrency}
                 onChange={(e) => setSelectedCurrency(e.target.value)}
+                disabled={loading}
                 sx={{
                   backgroundColor: '#ffffff',
                   borderRadius: '8px',
@@ -246,6 +253,7 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
           onClick={onClose}
           variant="outlined"
           fullWidth
+          disabled={loading}
           sx={{ 
             color: '#1a1a1a',
             borderColor: '#e5e7eb',
@@ -266,6 +274,7 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
           onClick={handleConfirm}
           variant="contained"
           fullWidth
+          disabled={loading || converting}
           sx={{
             backgroundColor: '#1a1a1a',
             color: 'white',
@@ -276,10 +285,21 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal }) => {
             fontSize: '1rem',
             '&:hover': {
               backgroundColor: '#2d2d2d',
+            },
+            '&.Mui-disabled': {
+              backgroundColor: '#d1d5db',
+              color: '#9ca3af',
             }
           }}
         >
-          Proceed to Payment
+          {loading ? (
+            <>
+              <CircularProgress size={20} sx={{ color: 'white', mr: 1.5 }} />
+              Creating Checkout Session...
+            </>
+          ) : (
+            'Proceed to Payment'
+          )}
         </Button>
       </DialogActions>
     </Dialog>

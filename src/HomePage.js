@@ -449,6 +449,7 @@ function HomePage() {
         onClose={() => setRenewalDialogOpen(false)}
         esimData={esimData}
         onConfirmRenewal={handlePackageSelect}
+        loading={renewalLoading}
       />
 
       <PaymentDialog
