@@ -351,9 +351,6 @@ function HomePage() {
             <Typography variant="h6" sx={{ mt: 3, color: '#475569' }}>
               Checking all API providers...
             </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: '#64748b' }}>
-              Querying AirHub, eSIMCard, and TravelRoam APIs
-            </Typography>
           </Box>
         )}
           </Container>
