@@ -215,7 +215,7 @@ function HomePage() {
                     lineHeight: 1.2,
                   }}
                 >
-                  esimstatus
+                  checkmysim
                 </Typography>
                 <Typography
                   sx={{
