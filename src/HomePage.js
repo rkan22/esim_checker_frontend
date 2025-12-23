@@ -349,7 +349,7 @@ function HomePage() {
           <Box textAlign="center" py={8}>
             <CircularProgress size={60} sx={{ color: '#4f46e5' }} />
             <Typography variant="h6" sx={{ mt: 3, color: '#475569' }}>
-              Checking all API providers...
+              Checking...
             </Typography>
           </Box>
         )}
@@ -363,7 +363,7 @@ function HomePage() {
                 color: '#64748b',
               }}
             >
-              Copyright © 2025 esimstatus.com
+              Copyright © 2025 checkmysim.com
             </Typography>
           </Box>
         </Box>
@@ -395,7 +395,7 @@ function HomePage() {
                     lineHeight: 1,
                   }}
                 >
-                  esimstatus
+                  Checkmysim
                 </Typography>
                 <Typography
                   sx={{
@@ -434,7 +434,7 @@ function HomePage() {
                 fontSize: '0.75rem',
               }}
             >
-              Copyright © 2025 esimstatus.com
+              Copyright © 2025 checkmysim.com
             </Typography>
           </Box>
         </Box>
