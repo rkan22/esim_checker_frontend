@@ -4,7 +4,7 @@
  */
 
 // Base URL for the backend API
-export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://esim-status-checker-backend.onrender.com,https://checkmysim.com/,checkmysim.com/';
+export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://esim-status-checker-backend.onrender.com';
 
 // API Endpoints
 export const API_ENDPOINTS = {
