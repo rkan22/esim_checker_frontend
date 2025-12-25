@@ -5,7 +5,6 @@ import {
   TextField,
   Button,
   Typography,
-  CircularProgress,
   InputAdornment,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,6 +15,7 @@ import SimpleRenewalDialog from './components/SimpleRenewalDialog';
 import PaymentDialog, { SuccessDialog } from './components/PaymentForm';
 import EmailDialog from './components/EmailDialog';
 import ESIMResults from './components/ESIMResults';
+import SimpleLoader from './components/SimpleLoader';
 import './App.css';
 
 function HomePage() {
@@ -330,28 +330,49 @@ function HomePage() {
             </form>
 
             {error && (
-              <Typography
-                variant="body2"
+              <Box
                 sx={{
-                  color: '#dc2626',
                   mt: 3,
-                  textAlign: 'center',
+                  p: 2.5,
+                  backgroundColor: '#fee2e2',
+                  border: '1px solid #fca5a5',
+                  borderRadius: '12px',
+                  maxWidth: '600px',
+                  margin: '24px auto 0',
                 }}
               >
-                {error}
-              </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#dc2626',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    fontSize: '1rem',
+                  }}
+                >
+                  {error}
+                </Typography>
+                {error.includes('timeout') || error.includes('Timeout') && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#991b1b',
+                      textAlign: 'center',
+                      display: 'block',
+                      mt: 1,
+                    }}
+                  >
+                    Tip: If you have many eSIMs, the search may take up to 2 minutes.
+                  </Typography>
+                )}
+              </Box>
             )}
           </Box>
         )}
 
         {/* Loading State */}
         {loading && (
-          <Box textAlign="center" py={8}>
-            <CircularProgress size={60} sx={{ color: '#4f46e5' }} />
-            <Typography variant="h6" sx={{ mt: 3, color: '#475569' }}>
-              Checking...
-            </Typography>
-          </Box>
+          <SimpleLoader message="Searching for your eSIM..." />
         )}
           </Container>
 

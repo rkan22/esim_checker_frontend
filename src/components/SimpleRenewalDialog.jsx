@@ -20,6 +20,7 @@ import {
   InfoOutlined as InfoIcon,
 } from '@mui/icons-material';
 import currencyService from '../services/currencyService';
+import SimpleLoadingIndicator from './SimpleLoadingIndicator';
 
 const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal, loading }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
@@ -293,10 +294,16 @@ const SimpleRenewalDialog = ({ open, onClose, esimData, onConfirmRenewal, loadin
           }}
         >
           {loading ? (
-            <>
-              <CircularProgress size={20} sx={{ color: 'white', mr: 1.5 }} />
-              Creating Checkout Session...
-            </>
+            <SimpleLoadingIndicator
+              isLoading={true}
+              messages={[
+                "Creating Checkout Session...",
+                "Preparing Payment...",
+                "Almost Ready..."
+              ]}
+              size={20}
+              color="white"
+            />
           ) : (
             'Proceed to Payment'
           )}

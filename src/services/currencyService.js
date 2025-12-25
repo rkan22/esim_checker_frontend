@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://esim-status-checker-backend.onrender.com/api/esim';
+import { API_BASE_URL } from '../config/api';
 
 /**
  * Currency Service for handling currency conversions and rates
@@ -12,7 +11,7 @@ class CurrencyService {
    */
   async getSupportedCurrencies() {
     try {
-      const response = await axios.get(`${API_BASE_URL}/currency/supported/`);
+      const response = await axios.get(`${API_BASE_URL}/api/esim/currency/supported/`);
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching supported currencies:', error);
@@ -32,7 +31,7 @@ class CurrencyService {
    */
   async getExchangeRate(from = 'USD', to = 'EUR') {
     try {
-      const response = await axios.get(`${API_BASE_URL}/currency/exchange-rate/`, {
+      const response = await axios.get(`${API_BASE_URL}/api/esim/currency/exchange-rate/`, {
         params: { from, to }
       });
       return response.data.data;
@@ -51,7 +50,7 @@ class CurrencyService {
    */
   async convertAmount(amount, fromCurrency = 'USD', toCurrency = 'EUR') {
     try {
-      const response = await axios.post(`${API_BASE_URL}/currency/convert/`, {
+      const response = await axios.post(`${API_BASE_URL}/api/esim/currency/convert/`, {
         amount: parseFloat(amount),
         from_currency: fromCurrency,
         to_currency: toCurrency
