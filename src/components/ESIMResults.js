@@ -176,7 +176,7 @@ function ESIMResults({
                       <Typography variant="body2" sx={{ color: '#6b7280', mb: 0.5, fontSize: '0.75rem', fontWeight: 600 }}>
                         Status:
                       </Typography>
-                      <Box sx={{ backgroundColor: '#f9fafb', color: esimData.status?.toLowerCase() === 'active' ? '#10b981' : '#f59e0b', p: 1.2, borderRadius: '8px', border: '1px solid #e5e7eb', fontWeight: 600, fontSize: '0.875rem' }}>
+                      <Box sx={{ backgroundColor: '#f9fafb', color: esimData.status?.toLowerCase() === 'active' ? '#10b981' : '#10b981', p: 1.2, borderRadius: '8px', border: '1px solid #e5e7eb', fontWeight: 600, fontSize: '0.875rem' }}>
                         {esimData.status}
                       </Box>
                     </Grid>
