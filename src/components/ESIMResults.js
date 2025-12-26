@@ -369,81 +369,63 @@ function ESIMResults({
                 Complete eSIM Details
               </Typography>
 
-              {/* Horizontal scrollable container */}
-              <Box sx={{ 
-                display: 'flex',
-                gap: 3,
-                pb: 2,
-                minWidth: 'max-content',
-                '& > *': {
-                  minWidth: '200px',
-                  flex: '0 0 auto'
-                }
-              }}>
-                {/* Column 1: IDs */}
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Identifiers
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <CompactField label="ORDER/SIM ID" value={esimData.order_sim_id} copyable copyKey="order_id" />
-                    <Divider />
+              {/* Responsive Grid Layout */}
+              <Grid container spacing={2}>
+                {/* Row 1: Identifiers */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Order/SIM ID" value={esimData.order_sim_id} copyable copyKey="order_id" />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
                     <CompactField label="ICCID" value={esimData.iccid} copyable copyKey="iccid" />
                   </Box>
-                </Box>
+                </Grid>
 
-                <Divider orientation="vertical" flexItem />
-
-                {/* Column 2: Status */}
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Status
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <CompactField label="STATUS" value={esimData.status} />
-                    <Divider />
-                    <CompactField label="PURCHASE DATE" value={formatDate(esimData.purchase_date)} />
+                {/* Row 2: Status & Date */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Status" value={esimData.status} />
                   </Box>
-                </Box>
-
-                <Divider orientation="vertical" flexItem />
-
-                {/* Column 3: Plan */}
-                <Box sx={{ minWidth: '300px' }}>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Plan Details
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <CompactField label="VALIDITY PERIOD" value={getValidityPeriod()} />
-                    <Divider />
-                    <CompactField label="DATA CAPACITY" value={getDataCapacity()} />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Purchase Date" value={formatDate(esimData.purchase_date)} />
                   </Box>
-                </Box>
+                </Grid>
 
-                <Divider orientation="vertical" flexItem />
-
-                {/* Column 4: Usage */}
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Data Usage
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <CompactField label="DATA CONSUMED" value={esimData.data_consumed} />
-                    <Divider />
-                    <CompactField label="DATA REMAINING" value={esimData.data_remaining} />
+                {/* Row 3: Plan Details */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Validity Period" value={getValidityPeriod()} />
                   </Box>
-                </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Data Capacity" value={getDataCapacity()} />
+                  </Box>
+                </Grid>
 
-                <Divider orientation="vertical" flexItem />
+                {/* Row 4: Usage */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Data Consumed" value={esimData.data_consumed} />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, height: '100%' }}>
+                    <CompactField label="Data Remaining" value={esimData.data_remaining} />
+                  </Box>
+                </Grid>
 
-                {/* Column 5: Plan Name */}
-                <Box sx={{ minWidth: '350px' }}>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Description
-                  </Typography>
-                  <CompactField label="PLAN DESCRIPTION" value={esimData.plan_name} />
-                </Box>
-              </Box>
+                {/* Row 5: Plan Description (Full Width) */}
+                <Grid item xs={12}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1 }}>
+                    <CompactField label="Plan Description" value={esimData.plan_name} />
+                  </Box>
+                </Grid>
+              </Grid>
 
               <Divider sx={{ my: 3 }} />
 
@@ -452,42 +434,30 @@ function ESIMResults({
                 Configuration Details
               </Typography>
 
-              <Box sx={{ 
-                display: 'flex',
-                gap: 3,
-                pb: 2,
-                minWidth: 'max-content',
-                '& > *': {
-                  minWidth: { xs: '250px', md: '300px' },
-                  flex: '0 0 auto'
-                }
-              }}>
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    Activation Code
-                  </Typography>
-                  <CompactField 
-                    label="ACTIVATION CODE" 
-                    value={esimData.activation_code} 
-                    copyable 
-                    copyKey="activation_code" 
-                  />
-                </Box>
+              {/* Configuration in responsive grid */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1 }}>
+                    <CompactField 
+                      label="Activation Code" 
+                      value={esimData.activation_code} 
+                      copyable 
+                      copyKey="activation_code" 
+                    />
+                  </Box>
+                </Grid>
 
-                <Divider orientation="vertical" flexItem />
-
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 2 }}>
-                    APN (Access Point)
-                  </Typography>
-                  <CompactField 
-                    label="APN" 
-                    value={esimData.apn} 
-                    copyable 
-                    copyKey="apn" 
-                  />
-                </Box>
-              </Box>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1 }}>
+                    <CompactField 
+                      label="APN (Access Point Name)" 
+                      value={esimData.apn} 
+                      copyable 
+                      copyKey="apn" 
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
             </Paper>
           </Box>
         )}
