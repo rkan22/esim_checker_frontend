@@ -15,9 +15,9 @@ const DynamicLoadingIndicator = ({ isLoading = false }) => {
   const loadingMessages = [
     { text: "Initializing search...", duration: 1500 },
     { text: "Connecting to eSIM providers...", duration: 2000 },
-    { text: "Querying AirHub database...", duration: 2500 },
-    { text: "Checking eSIMCard network...", duration: 2500 },
-    { text: "Searching TravelRoam catalog...", duration: 2500 },
+    { text: "Querying Vodafone database...", duration: 2500 },
+    { text: "Checking Orange network...", duration: 2500 },
+    { text: "Searching Roam2world catalog...", duration: 2500 },
     { text: "Analyzing provider responses...", duration: 2000 },
     { text: "Merging data sources...", duration: 1500 },
     { text: "Finalizing results...", duration: 1000 },
