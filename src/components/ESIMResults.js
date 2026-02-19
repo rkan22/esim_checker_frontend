@@ -165,7 +165,7 @@ function ESIMResults({
                 eSIM Status Report
               </Typography>
               <Typography variant="caption" sx={{ color: '#64748b' }}>
-                label="APN (Access Point Name)"
+                  Provider:
               </Typography>
             </Box>
             
