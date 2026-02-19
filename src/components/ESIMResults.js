@@ -165,7 +165,7 @@ function ESIMResults({
                 eSIM Status Report
               </Typography>
               <Typography variant="caption" sx={{ color: '#64748b' }}>
-                Provider: {esimData.api_provider}
+                Provider: "Roam2world"
               </Typography>
             </Box>
             
