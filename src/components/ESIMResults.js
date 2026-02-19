@@ -165,7 +165,7 @@ function ESIMResults({
                 eSIM Status Report
               </Typography>
               <Typography variant="caption" sx={{ color: '#64748b' }}>
-                Provider: "Roam2world"
+                label="APN (Access Point Name)"
               </Typography>
             </Box>
             
